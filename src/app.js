@@ -7,7 +7,13 @@ import { usuarioRoutes } from './rutas/usuarios.js'
 const app = express()
 
 // ✅ Configuración CORS que acepta múltiples orígenes
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:3001'];
+const allowedOrigins = [
+    'http://localhost:3000', 
+    'http://localhost:5173', 
+    'http://localhost:3001',
+    'https://frontend-pedidos-production-9ca5.up.railway.app', // Frontend en Railway
+    'https://backend-pedidos-production-cd92.up.railway.app'  // Backend mismo (para pruebas)
+];
 
 app.use(cors({
     origin: function(origin, callback) {
@@ -34,9 +40,22 @@ app.use(express.json())
 pedidosRoutes(app)
 usuarioRoutes(app)
 
-// Ruta de prueba
+// Ruta de prueba - Mejorada para devolver JSON
 app.get('/', (req, res) => {
-    res.send('Hola from Express!')
+    res.json({ 
+        status: 'success',
+        message: 'API de Pedidos funcionando correctamente',
+        timestamp: new Date().toISOString(),
+        mongodb: 'connected' // Si tienes mongoose, puedes verificar el estado
+    })
+})
+
+// Ruta de health check
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'healthy',
+        timestamp: new Date().toISOString()
+    })
 })
 
 export { app }
