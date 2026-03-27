@@ -9,7 +9,8 @@ try {
 
     const PORT = process.env.PORT || 3001
 
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0',() => {
+        console.log('URL en Railway: https://backend-pedidos-production-cd92.up.railway.app')
         console.log(`Servidor ejecutándose en http://localhost:${PORT}`)
     })
 
