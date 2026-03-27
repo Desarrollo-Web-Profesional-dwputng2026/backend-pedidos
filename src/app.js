@@ -6,56 +6,56 @@ import { usuarioRoutes } from './rutas/usuarios.js'
 
 const app = express()
 
-// ✅ Configuración CORS que acepta múltiples orígenes
-const allowedOrigins = [
-    'http://localhost:3000', 
-    'http://localhost:5173', 
-    'http://localhost:3001',
-    'https://frontend-pedidos-production-9ca5.up.railway.app', // Frontend en Railway
-    'https://backend-pedidos-production-cd92.up.railway.app'  // Backend mismo (para pruebas)
-];
+console.log('🔧 Configurando aplicación...');
 
+// Configuración CORS abierta para pruebas
 app.use(cors({
-    origin: function(origin, callback) {
-        // Permitir solicitudes sin origen (como Postman)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            console.log('Origen bloqueado por CORS:', origin);
-            callback(new Error('No permitido por CORS'));
-        }
-    },
+    origin: '*',  // Temporalmente permitir todos
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true,
-    optionsSuccessStatus: 200
+    allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
-// Middleware para parsear JSON
 app.use(express.json())
 
-// Configurar rutas
-pedidosRoutes(app)
-usuarioRoutes(app)
-
-// Ruta de prueba - Mejorada para devolver JSON
+// RUTAS OBLIGATORIAS - Deben estar ANTES que las demás
 app.get('/', (req, res) => {
-    res.json({ 
+    console.log('✅ Ruta raíz / llamada');
+    res.status(200).json({ 
         status: 'success',
-        message: 'API de Pedidos funcionando correctamente',
+        message: 'API de Pedidos funcionando',
         timestamp: new Date().toISOString(),
-        mongodb: 'connected' // Si tienes mongoose, puedes verificar el estado
+        mongodb: 'connected'
     })
 })
 
-// Ruta de health check
 app.get('/health', (req, res) => {
+    console.log('✅ Health check llamado');
     res.status(200).json({ 
         status: 'healthy',
         timestamp: new Date().toISOString()
     })
 })
+
+app.get('/test', (req, res) => {
+    console.log('✅ Test endpoint llamado');
+    res.status(200).json({ message: 'Test exitoso' })
+})
+
+// Configurar tus rutas
+console.log('📦 Cargando rutas de pedidos...');
+pedidosRoutes(app)
+console.log('📦 Cargando rutas de usuarios...');
+usuarioRoutes(app)
+
+// Middleware para rutas no encontradas
+app.use((req, res) => {
+    console.log(`⚠️ Ruta no encontrada: ${req.method} ${req.url}`);
+    res.status(404).json({ 
+        error: 'Ruta no encontrada',
+        path: req.url 
+    })
+})
+
+console.log('✅ App configurada completamente');
 
 export { app }

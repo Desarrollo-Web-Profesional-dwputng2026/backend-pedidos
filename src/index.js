@@ -2,13 +2,10 @@ import dotenv from 'dotenv';
 
 console.log('🚀 INICIO DEL SERVIDOR');
 console.log('📦 Node.js:', process.version);
+console.log('🌍 NODE_ENV:', process.env.NODE_ENV || 'development');
 
-// Solo cargar .env en desarrollo
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config();
-    console.log('📁 Modo desarrollo');
-} else {
-    console.log('🌍 Modo producción (Railway)');
 }
 
 import { app } from './app.js';
@@ -21,12 +18,20 @@ const startServer = async () => {
         
         const PORT = process.env.PORT || 3001;
         
-        app.listen(PORT, '0.0.0.0', () => {
+        console.log(`📡 Intentando iniciar en puerto ${PORT}`);
+        
+        const server = app.listen(PORT, '0.0.0.0', () => {
             console.log(`✅ Servidor corriendo en puerto ${PORT}`);
+            console.log(`🌐 Escuchando en: 0.0.0.0:${PORT}`);
+        });
+        
+        server.on('error', (error) => {
+            console.error('❌ Error en servidor:', error);
+            process.exit(1);
         });
         
     } catch (err) {
-        console.error('❌ Error fatal:', err.message);
+        console.error('❌ Error fatal:', err);
         process.exit(1);
     }
 };
