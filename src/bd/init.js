@@ -9,38 +9,28 @@ export async function initBaseDeDatos() {
         throw new Error('❌ DATABASE_URL no está configurada');
     }
     
-    // Mostrar URL ocultando contraseña
     const urlPreview = DATABASE_URL.replace(/\/\/(.*)@/, '//***:***@');
     console.log('🔗 Conectando a:', urlPreview);
     
-    // Configuración SIMPLIFICADA - sin opciones obsoletas
+    // Opciones mínimas para conexión con +srv
     const options = {
-        serverSelectionTimeoutMS: 30000,
-        socketTimeoutMS: 60000,
-        connectTimeoutMS: 30000,
-        family: 4, // Forzar IPv4
-        retryWrites: true,
-        retryReads: true,
-        maxPoolSize: 10
+        serverSelectionTimeoutMS: 30000
     };
     
-    console.log('⚙️ Opciones:', options);
-    
     mongoose.connection.on("error", (error) => {
-        console.error("❌ Error de conexión:", error.message);
+        console.error("❌ Error de Mongoose:", error.message);
     });
     
     mongoose.connection.on("connected", () => {
-        console.log("✅ Conectado exitosamente a MongoDB Atlas");
+        console.log("✅ ¡MongoDB Atlas conectado exitosamente!");
     });
     
     try {
-        console.log('🔄 Conectando...');
         await mongoose.connect(DATABASE_URL, options);
-        console.log("✅ ¡Conexión exitosa!");
+        console.log("✅ Conexión establecida con MongoDB Atlas");
         return mongoose.connection;
     } catch (error) {
-        console.error("❌ Error:", error.message);
+        console.error("❌ Error conectando a MongoDB:", error.message);
         throw error;
     }
 }
